@@ -1,28 +1,27 @@
 #!/usr/bin/python3
-from typing import List
-
-"""Returns a list of integers representing a pascal's triangle
-"""
+"""Pascal Triangle Interview Challenge"""
 
 
-def pascal_triangle(n: int) -> List[List[int]]:
-    """function to print pascal's triangle
+def pascal_triangle(n):
+    """returns a list of lists of numbers
+    representing the pascal triangle"""
+    if n <= 0:
+        return []
 
-    Args:
-        n (int): rows of the triangle
+    pascal_triangle = [0] * n
 
-    Returns:
-        List[List[int]]:List of list of integers representing the triangle
-        if n <= 0 returns an empty list
-    """
-    res = [[1]]
+    for i in range(n):
+        # define row-fill first and last idx with 1
+        new_row = [0] * (i+1)
+        new_row[0] = 1
+        new_row[len(new_row) - 1] = 1
 
-    while n > 0:
-        for i in range(n - 1):
-            tmp = [0] + res[-1] + [0]
-            row = []
-            # define the next row
-            for j in range(len(res[-1]) + 1):
-                row.append(tmp[j] + tmp[j + 1])
-            res.append(row)
-        return res
+        for j in range(1, i):
+            if j > 0 and j < len(new_row):
+                a = pascal_triangle[i - 1][j]
+                b = pascal_triangle[i - 1][j - 1]
+                new_row[j] = a + b
+
+        pascal_triangle[i] = new_row
+
+    return pascal_triangle
