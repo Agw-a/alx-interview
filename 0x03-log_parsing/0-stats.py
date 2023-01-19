@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''Parse HTTP request logs
 '''
 import sys
