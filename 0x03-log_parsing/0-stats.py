@@ -2,48 +2,66 @@
 '''Parse HTTP request logs
 '''
 import sys
-
+import re
+import random
 
 # def verify_input():
 #     '''determines if the format is as described or to skip the line
 #     '''
 #     log_format = ''
 #     pass
-
-def parse(inpt, size):
-    '''Prints logs'''
-    print("File size: {:d}".format(size))
-    for i in sorted(inpt.keys()):
-        if inpt[i] != 0:
-            print("{}: {:d}".format(i, inpt[i]))
-
-
-status = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
-       "404": 0, "405": 0, "500": 0}
 counter = 0
-size = 0
-
-try:
-    for line in sys.stdin:
-        if counter != 0 and counter % 10 == 0:
-            parse(status, size)
-
-        statusList = line.split()
-        counter += 1
-
-        try:
-            size += int(statusList[-1])
-        except:
-            pass
-
-        try:
-            if statusList[-2] in status:
-                status[statusList[-2]] += 1
-        except:
-            pass
-    parse(status, size)
+n = 0
 
 
-except KeyboardInterrupt:
-    parse(status, size)
-    raise
+def printLogs(size, status, response):
+    '''Print HTTP logs
+    '''
+    print("File size: {:d}".format(size))
+    for i in status:
+        if response[i] > 0:
+            print('{}: {}'.format(i, response[i]))
+    
+def parse():
+    '''Prse http logs
+    '''
+    try:
+        i = 0
+        fSize = 0
+        statusResponse = {
+            '200':0,
+            '301': 0,
+            '400': 0,
+            '401': 0,
+            '403': 0,
+            '404': 0,
+            '405': 0,
+            '500': 0
+        }
+        statusCode = ['200', '301', '400', '401', '403', '404', '405', '500']
+        for lines in sys.stdin:
+            queryStr = re.search(r'[2-5]0[0-5] \d+', lines)
+            if queryStr is None:
+                continue
+            queryStr = queryStr.group()
+            values = queryStr.split(' ')
+            status = values[0]
+            size = values[1]
+            if status in statusCode:
+                statusResponse[status] += 1
+            try:
+                fSize += int(size)
+            except Exception:
+                pass
+            if n == 9:
+                n = 0
+                printLogs(fSize, statusCode, statusResponse)
+                continue
+            n += 1
+    except KeyboardInterrupt as e:
+        printLogs(fSize, statusCode, statusResponse)
+        print(e)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    parse()
