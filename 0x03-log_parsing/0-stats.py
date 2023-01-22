@@ -23,7 +23,7 @@ def print_status():
     print("File size: {}".format(n))
     for status_code in sorted(status_codes.keys()):
         if status_codes[status_code]:
-            print("{}: {}".format(n, status_codes[n]))
+            print("{}: {}".format(status_code, status_codes[status_code]))
 
 
 if __name__ == "__main__":
