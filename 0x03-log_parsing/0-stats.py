@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''Parse HTTP request logs
+'''Parse HTTP request logs/print from stdin
 '''
 from sys import stdin
 
