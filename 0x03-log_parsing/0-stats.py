@@ -1,47 +1,44 @@
 #!/usr/bin/python3
 '''Parse HTTP request logs/print from stdin
 '''
-from sys import stdin
-
-status_codes = {
-    "200": 0,
-    "301": 0,
-    "400": 0,
-    "401": 0,
-    "403": 0,
-    "404": 0,
-    "405": 0,
-    "500": 0
-}
-
-n = 0
+import sys
 
 
-def print_status():
-    '''Print logs
-    '''
-    print("File size: {}".format(n))
-    for status_code in sorted(status_codes.keys()):
-        if status_codes[status_code]:
-            print("{}: {}".format(status_code, status_codes[status_code]))
+def printStatus(dic, size):
+    """ Prints information """
+    print("File size: {:d}".format(size))
+    for i in sorted(dic.keys()):
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
 
 
-if __name__ == "__main__":
-    count = 0
-    try:
-        for line in stdin:
-            try:
-                item = line.split()
-                n += int(item[-1])
-                if item[-2] in status_codes:
-                    status_codes[item[-2]] += 1
-            except:
-                pass
-            if count == 9:
-                print_status()
-                count = -1
-            count += 1
-    except KeyboardInterrupt:
-        print_status()
-        raise
-    print_status()
+statusCodes = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+               "404": 0, "405": 0, "500": 0}
+
+count = 0
+size = 0
+
+try:
+    for line in sys.stdin:
+        if count != 0 and count % 10 == 0:
+            printStatus(statusCodes, size)
+
+        stlist = line.split()
+        count += 1
+
+        try:
+            size += int(stlist[-1])
+        except Exception:
+            pass
+
+        try:
+            if stlist[-2] in statusCodes:
+                statusCodes[stlist[-2]] += 1
+        except Exception:
+            pass
+    printStatus(statusCodes, size)
+
+
+except KeyboardInterrupt:
+    printStatus(statusCodes, size)
+    raise
