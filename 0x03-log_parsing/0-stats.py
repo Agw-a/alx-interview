@@ -1,67 +1,47 @@
 #!/usr/bin/python3
 '''Parse HTTP request logs
 '''
-import sys
-import re
-import random
+from sys import stdin
 
-# def verify_input():
-#     '''determines if the format is as described or to skip the line
-#     '''
-#     log_format = ''
-#     pass
-counter = 0
+status_codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
+
 n = 0
 
 
-def printLogs(size, status, response):
-    '''Print HTTP logs
+def print_status():
+    '''Print logs
     '''
-    print("File size: {:d}".format(size))
-    for i in status:
-        if response[i] > 0:
-            print('{}: {}'.format(i, response[i]))
-    
-def parse():
-    '''Prse http logs
-    '''
-    try:
-        i = 0
-        fSize = 0
-        statusResponse = {
-            '200':0,
-            '301': 0,
-            '400': 0,
-            '401': 0,
-            '403': 0,
-            '404': 0,
-            '405': 0,
-            '500': 0
-        }
-        statusCode = ['200', '301', '400', '401', '403', '404', '405', '500']
-        for lines in sys.stdin:
-            queryStr = re.search(r'[2-5]0[0-5] \d+', lines)
-            if queryStr is None:
-                continue
-            queryStr = queryStr.group()
-            values = queryStr.split(' ')
-            status = values[0]
-            size = values[1]
-            if status in statusCode:
-                statusResponse[status] += 1
-            try:
-                fSize += int(size)
-            except Exception:
-                pass
-            if n == 9:
-                n = 0
-                printLogs(fSize, statusCode, statusResponse)
-                continue
-            n += 1
-    except KeyboardInterrupt as e:
-        printLogs(fSize, statusCode, statusResponse)
-        print(e)
-        sys.exit(1)
+    print("File size: {}".format(n))
+    for status_code in sorted(status_codes.keys()):
+        if status_codes[status_code]:
+            print("{}: {}".format(n, status_codes[n]))
 
-if __name__ == '__main__':
-    parse()
+
+if __name__ == "__main__":
+    count = 0
+    try:
+        for line in stdin:
+            try:
+                item = line.split()
+                n += int(item[-1])
+                if item[-2] in status_codes:
+                    status_codes[item[-2]] += 1
+            except:
+                pass
+            if count == 9:
+                print_status()
+                count = -1
+            count += 1
+    except KeyboardInterrupt:
+        print_status()
+        raise
+    print_status()
