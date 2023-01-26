@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 '''UTF-8 Validation
 '''
-from typing import List
 
 
-def validUTF8(data: List[int]) -> bool:
+def validUTF8(data):
     """determine if a dataset represent valid UTF=8
 
     Args:
