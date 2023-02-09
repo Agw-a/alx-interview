@@ -1,0 +1,1 @@
+## Script that prints all star wars characters
