@@ -1,9 +1,13 @@
 #!/usr/bin/python3
+'''Rotates a 2D matrix
+'''
+
+
 def rotate_2d_matrix(matrix):
-    """_summary_
+    """rotate a 2D matrix clockwise
 
     Args:
-        matrix (_type_): _description_
+        2D matrix
     """
     if type(matrix) != list:
         return
