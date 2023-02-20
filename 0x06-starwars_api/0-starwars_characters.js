@@ -1,25 +1,33 @@
 #!/usr/bin/node
+
 const request = require('request');
-const API_URL = 'https://swapi-api.hbtn.io/api';
 
-if (process.argv.length > 2) {
-  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
-    if (err) {
-      console.log(err);
-    }
-    const charactersURL = JSON.parse(body).characters;
-    const charactersName = charactersURL.map(
-      url => new Promise((resolve, reject) => {
-        request(url, (promiseErr, __, charactersReqBody) => {
-          if (promiseErr) {
-            reject(promiseErr);
-          }
-          resolve(JSON.parse(charactersReqBody).name);
-        });
-      }));
-
-    Promise.all(charactersName)
-      .then(names => console.log(names.join('\n')))
-      .catch(allErr => console.log(allErr));
-  });
+if (process.argv.length >= 3) {
+  let filmId = process.argv[2];
+  filmId = parseInt(filmId);
+  if (Number.isInteger(filmId)) {
+    request(`https://swapi-api.alx-tools.com/api/films/${filmId}`,
+      function (error, response, body) {
+        if (error) { return console.log(error); }
+        if (!error && response.statusCode === 200) {
+          const characters = JSON.parse(body).characters;
+          const characterNames = characters.map(function (character) {
+            const P = new Promise((resolve, reject) => {
+              request(character, (err, res, bdy) => {
+                if (!err) {
+                  resolve(JSON.parse(bdy).name);
+                } else {
+                  reject(err);
+                }
+              });
+            });
+            return P;
+          });
+          Promise.all(characterNames)
+            .then((char) => { console.log(char.join('\n')); })
+            .catch(e => console.log(e));
+        }
+      }
+    );
+  }
 }
