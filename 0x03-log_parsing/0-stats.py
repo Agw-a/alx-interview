@@ -1,72 +1,46 @@
 #!/usr/bin/python3
 '''Parse HTTP request logs/print from stdin
 '''
-import sys
-import re
+from sys import stdin
+
+status_codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
+
+size = 0
 
 
-fileSize = 0
-i = 0
+def print_stats():
+    """Prints the accumulated logs"""
+    print("File size: {}".format(size))
+    for status in sorted(status_codes.keys()):
+        if status_codes[status]:
+            print("{}: {}".format(status, status_codes[status]))
 
 
-def print_log(fileSize, statusCodes, responses):
-    """
-     prints accumulated logs.
-    """
-    print('File size: {}'.format(fileSize))
-    for code in statusCodes:
-        if responses[code] > 0:
-            print('{}: {}'.format(code, responses[code]))
-
-
-def run():
-    """
-    Parses logs
-    """
+if __name__ == "__main__":
+    count = 0
     try:
-        i = 0
-        fileSize = 0
-        responses = {
-            '200': 0,
-            '301': 0,
-            '400': 0,
-            '401': 0,
-            '403': 0,
-            '404': 0,
-            '405': 0,
-            '500': 0
-        }
-        statusCodes = ['200', '301', '400', '401', '403', '404', '405', '500']
-        for line in sys.stdin:
-            neededString = re.search(r'[2-5]0[0-5] \d+', line)
-            if neededString is None:
-                continue
-            neededString = neededString.group()
-            values = neededString.split(' ')
-            status = values[0]
-            size = values[1]
+        for line in stdin:
             try:
-                size = int(size)
-                size = str(size)
-            except Exception:
-                continue
-            if status in statusCodes:
-                responses[status] += 1
-            try:
-                fileSize += int(size)
-            except Exception:
+                items = line.split()
+                size += int(items[-1])
+                if items[-2] in status_codes:
+                    status_codes[items[-2]] += 1
+            except:
                 pass
-            if i == 9:
-                i = 0
-                print_log(fileSize, statusCodes, responses)
-                continue
-            i += 1
-        print_log(fileSize, statusCodes, responses)
-    except KeyboardInterrupt as e:
-        print_log(fileSize, statusCodes, responses)
-        print(e)
-        sys.exit(1)
-
-
-if __name__ == '__main__':
-    run()
+            if count == 9:
+                print_stats()
+                count = -1
+            count += 1
+    except KeyboardInterrupt:
+        print_stats()
+        raise
+    print_stats()
