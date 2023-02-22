@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-"""N queens solution finder module.
+"""N queens solution module.
 """
 import sys
 
 
 class NQueens:
     """
-    Implement NQueens algirithm
+    Implement NQueens algorithm
     """
 
     dangerZones = {}
@@ -98,7 +98,7 @@ class NQueens:
         return False
 
     def get_all_positions(self):
-        """ Starter funciont for get_positions """
+        """ Starter for get_positions """
         positions = []
         for i in range(self.columns):
             if self.get_positions(0, i):
